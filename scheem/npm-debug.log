@@ -1,0 +1,87 @@
+info it worked if it ends with ok
+verbose cli [ 'node', '/usr/local/bin/npm', 'install', '-g', 'pegjs' ]
+info using npm@1.1.19
+info using node@v0.7.9-pre
+verbose config file /home/william/.npmrc
+verbose config file /usr/local/etc/npmrc
+verbose config file /usr/local/lib/node_modules/npm/npmrc
+verbose cache add [ 'pegjs', null ]
+silly cache add: name, spec, args [ undefined, 'pegjs', [ 'pegjs', null ] ]
+verbose parsed url { pathname: 'pegjs', path: 'pegjs', href: 'pegjs' }
+verbose addNamed [ 'pegjs', '' ]
+verbose addNamed [ null, '' ]
+silly name, range, hasData [ 'pegjs', '', false ]
+verbose raw, before any munging pegjs
+verbose url resolving [ 'https://registry.npmjs.org/', './pegjs' ]
+verbose url resolved https://registry.npmjs.org/pegjs
+verbose etag "BRQMQ7E4TRCS1YRE60BPPOMS1"
+http GET https://registry.npmjs.org/pegjs
+http 304 https://registry.npmjs.org/pegjs
+silly get cb [ 304,
+silly get cb   { server: 'CouchDB/1.2.0 (Erlang OTP/R15B)',
+silly get cb     etag: '"BRQMQ7E4TRCS1YRE60BPPOMS1"',
+silly get cb     date: 'Thu, 03 May 2012 00:09:43 GMT',
+silly get cb     'content-length': '0' } ]
+verbose etag pegjs from cache
+silly name, range, hasData 2 [ 'pegjs', '', true ]
+silly versions [ 'pegjs', [ '0.6.0', '0.6.1', '0.6.2', '0.7.0' ] ]
+verbose bin dist [ null,
+verbose bin dist   { shasum: 'aaa1f824f9e7197ec44e22a57af522f700dd689e',
+verbose bin dist     tarball: 'http://registry.npmjs.org/pegjs/-/pegjs-0.7.0.tgz' } ]
+verbose caching /home/william/.npm/pegjs/0.7.0/package/package.json
+verbose loadDefaults pegjs@0.7.0
+silly resolved [ { name: 'pegjs',
+silly resolved     version: '0.7.0',
+silly resolved     description: 'Parser generator for JavaScript',
+silly resolved     homepage: 'http://pegjs.majda.cz/',
+silly resolved     author: 
+silly resolved      { name: 'David Majda',
+silly resolved        email: 'david@majda.cz',
+silly resolved        url: 'http://majda.cz/' },
+silly resolved     main: 'lib/peg',
+silly resolved     bin: { pegjs: 'bin/pegjs' },
+silly resolved     repository: { type: 'git', url: 'git://github.com/dmajda/pegjs.git' },
+silly resolved     devDependencies: { 'uglify-js': '>= 1.2.4', jshint: '>= 0.5.5' },
+silly resolved     engines: { node: '>= 0.6.6' },
+silly resolved     _id: 'pegjs@0.7.0',
+silly resolved     dependencies: {},
+silly resolved     optionalDependencies: {},
+silly resolved     _engineSupported: true,
+silly resolved     _npmVersion: '1.1.19',
+silly resolved     _nodeVersion: 'v0.7.9-pre',
+silly resolved     _defaultsLoaded: true,
+silly resolved     _from: 'pegjs' } ]
+info into /usr/local/lib pegjs@0.7.0
+info installOne pegjs@0.7.0
+verbose from cache /home/william/.npm/pegjs/0.7.0/package/package.json
+info unbuild /usr/local/lib/node_modules/pegjs
+verbose caching /usr/local/lib/node_modules/pegjs/package.json
+info preuninstall pegjs@0.7.0
+info uninstall pegjs@0.7.0
+verbose unbuild pegjs@0.7.0 [ true,
+verbose unbuild pegjs@0.7.0   '/usr/local/lib/node_modules',
+verbose unbuild pegjs@0.7.0   '/usr/local/lib/node_modules' ]
+verbose binRoot [ '/usr/local/bin', { pegjs: 'bin/pegjs' } ]
+info unbuild /usr/local/lib/node_modules/pegjs
+verbose caching /usr/local/lib/node_modules/pegjs/package.json
+info preuninstall pegjs@0.7.0
+info uninstall pegjs@0.7.0
+verbose unbuild pegjs@0.7.0 [ true,
+verbose unbuild pegjs@0.7.0   '/usr/local/lib/node_modules',
+verbose unbuild pegjs@0.7.0   '/usr/local/lib/node_modules' ]
+verbose binRoot [ '/usr/local/bin', { pegjs: 'bin/pegjs' } ]
+ERR! error rolling back pegjs@0.7.0 Error: EACCES, unlink '/usr/local/bin/pegjs'
+ERR! Error: EACCES, unlink '/usr/local/bin/pegjs'
+ERR! 
+ERR! Please try running this command again as root/Administrator.
+ERR! 
+ERR! System Linux 2.6.38-14-generic
+ERR! command "node" "/usr/local/bin/npm" "install" "-g" "pegjs"
+ERR! cwd /home/william/git/CompilerCourse/scheem
+ERR! node -v v0.7.9-pre
+ERR! npm -v 1.1.19
+ERR! path /usr/local/bin/pegjs
+ERR! code EACCES
+ERR! message EACCES, unlink '/usr/local/bin/pegjs'
+ERR! errno {}
+verbose exit [ 1, true ]
