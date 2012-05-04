@@ -1,0 +1,89 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet"
+    href="http://nathansuniversity.com/css/mocha.css" />
+  <script src=
+    "http://nathansuniversity.com/js/jquery-1.7.1.min.js">
+  </script>
+  <script src=
+    "http://nathansuniversity.com/js/chai.js">
+  </script>
+  <script src="http://nathansuniversity.com/js/mocha.js">
+  </script>
+  <script>mocha.setup('tdd')</script>
+  <script>
+var expect = chai.expect;    
+var assert = chai.assert;
+
+// A half-baked implementation of evalScheem
+var evalScheem = function (expr, env) {
+    // Numbers evaluate to themselves
+    if (typeof expr === 'number') {
+        return expr;
+    }
+    // Look at head of list for operation
+    switch (expr[0]) {
+        case '+':
+            return evalScheem(expr[1], env) +
+                   evalScheem(expr[2], env);
+        case 'quote':
+            return expr[1];
+    }
+};
+
+// Some unit tests
+
+suite('quote', function() {
+    test('a number', function() {
+        assert.deepEqual(
+            evalScheem(['quote', 3], {}),
+            3
+        );
+    });
+    test('an atom', function() {
+        assert.deepEqual(
+            evalScheem(['quote', 'dog'], {}),
+            'dog'
+        );
+    });
+    test('a list', function() {
+        assert.deepEqual(
+            evalScheem(['quote', [1, 2, 3]], {}),
+            [1, 2, 3]
+        );
+    });
+});
+suite('add', function() {
+    test('two numbers', function() {
+        assert.deepEqual(
+            evalScheem(['+', 3, 5], {}),
+            8
+        );
+    });
+    test('a number and an expression', function() {
+        assert.deepEqual(
+            evalScheem(['+', 3, ['+', 2, 2]], {}),
+            7
+        );
+    });
+    test('a dog and a cat', function() {
+        assert.deepEqual(
+            evalScheem(['+', 'dog', 'cat'], {}),
+            42
+        );
+    });
+});
+
+  </script>
+  <script>
+    $(function(){
+      mocha.run();
+    });
+  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
