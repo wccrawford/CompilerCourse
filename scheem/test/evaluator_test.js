@@ -1,6 +1,6 @@
 if(typeof module != 'undefined') {
-//    var assert = require('chai').assert;
-	var assert = require('assert');
+    var assert = require('chai').assert;
+//	var assert = require('assert');
     var fs = require('fs');
 	var evalScheem = require('../scheem_evaluator.js').evalScheem;
 //    var peg = require('pegjs');
@@ -54,6 +54,15 @@ suite('values', function() {
 		assert.deepEqual(env['variable'], 5);
 	});
 
+	test('should be able to redefine values for existing variable names', function() {
+		var env = {variable:6};
+		assert.deepEqual(
+			evalScheem(['define', 'variable', 5], env),
+			0
+		);
+		assert.deepEqual(env['variable'], 5);
+	});
+
 	test('should define values for new variable names and return it from begin', function() {
 		var env = {};
 		assert.deepEqual(
@@ -71,6 +80,12 @@ suite('values', function() {
 		);
 		assert.deepEqual(env['variable'], 5);
 	});
+
+	test('should throw exception with set! when variable isn\'t already set', function() {
+		assert.throws(function() {
+			evalScheem(['set!', 'variable', 5], {});
+		});
+	});
 });
 
 suite('math', function() {
@@ -81,11 +96,35 @@ suite('math', function() {
 		);
 	});
 
+	test('should throw exception if first argument of + is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['+', ['quote', 'x'], 3], {})
+		});
+	});
+
+	test('should throw exception if second argument of + is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['+', 1, ['quote', 'x']], {})
+		});
+	});
+
 	test('should subtract 2 numbers', function() {
 		assert.deepEqual(
 			evalScheem(['-', 5, 3], {}),
 			2
 		);
+	});
+
+	test('should throw exception if first argument of - is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['-', ['quote', 'x'], 3], {})
+		});
+	});
+
+	test('should throw exception if second argument of - is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['-', 1, ['quote', 'x']], {})
+		});
 	});
 
 	test('should multiply 2 numbers', function() {
@@ -95,11 +134,41 @@ suite('math', function() {
 		);
 	});
 
+	test('should throw exception if first argument of * is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['*', ['quote', 'x'], 3], {})
+		});
+	});
+
+	test('should throw exception if second argument of * is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['*', 1, ['quote', 'x']], {})
+		});
+	});
+
 	test('should divide 2 numbers', function() {
 		assert.deepEqual(
 			evalScheem(['/', 10, 5], {}),
 			2
 		);
+	});
+	
+	test('should throw exception if first argument of / is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['/', ['quote', 'x'], 3], {})
+		});
+	});
+
+	test('should throw exception if second argument of / is not numeric', function() {
+		assert.throws(function() {
+			evalScheem(['/', 1, ['quote', 'x']], {})
+		});
+	});
+
+	test('should throw exception if second argument of / is 0', function() {
+		assert.throws(function() {
+			evalScheem(['/', 1, 0], {})
+		});
 	});
 });
 
@@ -159,6 +228,12 @@ suite('conditionals', function() {
 			3
 		);
 	});
+
+	test('should throw exception if conditional is neither true nor false', function() {
+		assert.throws(function() {
+			evalScheem(['if', 1, 2, 3], {})
+		});
+	});
 });
 
 suite('arrays', function() {
@@ -176,6 +251,12 @@ suite('arrays', function() {
 		);
 	});
 
+	test('should throw exception if second argument of cons isn\'t a list', function() {
+		assert.throws(function() {
+			evalScheem(['cons', ['quote', [1, 2]], ['quote', 3]], {});
+		});
+	});
+
 	test('should return the first item in array with car', function() {
 		assert.deepEqual(
 			evalScheem(['car', ['quote', [[1, 2], 3, 4]]], {}),
@@ -183,11 +264,23 @@ suite('arrays', function() {
 		);
 	});
 
+	test('should throw exception if first argument of car isn\'t a list', function() {
+		assert.throws(function() {
+			evalScheem(['car', ['quote', 1]], {});
+		});
+	});
+
 	test('should return all but the first item in array with cdr', function() {
 		assert.deepEqual(
 			evalScheem(['cdr', ['quote', [[1, 2], 3, 4]]], {}),
 			[3, 4]
 		);
+	});
+	
+	test('should throw exception if first argument of cdr isn\'t a list', function() {
+		assert.throws(function() {
+			evalScheem(['cdr', ['quote', 1]], {});
+		});
 	});
 });
 
