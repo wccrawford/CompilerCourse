@@ -1,6 +1,8 @@
-var peg = require('pegjs');
-var assert = require('assert');
-var evalScheem = require('./scheem_evaluator.js').evalScheem;
+if(typeof require != 'undefined') {
+	var peg = require('pegjs');
+	var assert = require('assert');
+	var evalScheem = require('../scheem_evaluator.js').evalScheem;
+}
 
 describe('Interpreter', function() {
 	describe('begin', function() {
