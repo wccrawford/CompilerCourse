@@ -2,7 +2,9 @@ if(typeof module != 'undefined') {
     var assert = require('chai').assert;
 //	var assert = require('assert');
     var fs = require('fs');
-	var evalScheem = require('../scheem_evaluator.js').evalScheem;
+	var scheem = require('../scheem_evaluator.js');
+	var evalScheem = scheem.evalScheem;
+
 //    var peg = require('pegjs');
 //    var parse = peg.buildParser(fs.readFileSync('scheem.peg', 'utf-8')).parse;
 }
@@ -31,16 +33,16 @@ suite('values', function() {
 		);
 	});
 
-	test('should return numbers if they\'re the only item in a list', function() {
+	/*test('should return numbers if they\'re the only item in a list', function() {
 		assert.deepEqual(
 			evalScheem([2], {}),
 			2
 		);
-	});
+	});*/
 
 	test('should return values from variable names', function() {
 		assert.deepEqual(
-			evalScheem('variable', {variable:'test'}),
+			evalScheem('variable', scheem.update({}, 'variable', 'test')),
 			'test'
 		);
 	});
@@ -51,16 +53,16 @@ suite('values', function() {
 			evalScheem(['define', 'variable', 5], env),
 			0
 		);
-		assert.deepEqual(env['variable'], 5);
+		assert.deepEqual(scheem.lookup(env, 'variable'), 5);
 	});
 
 	test('should be able to redefine values for existing variable names', function() {
-		var env = {variable:6};
+		var env = scheem.update({}, 'variable', 6);
 		assert.deepEqual(
 			evalScheem(['define', 'variable', 5], env),
 			0
 		);
-		assert.deepEqual(env['variable'], 5);
+		assert.deepEqual(scheem.lookup(env, 'variable'), 5);
 	});
 
 	test('should define values for new variable names and return it from begin', function() {
@@ -69,16 +71,16 @@ suite('values', function() {
 			evalScheem(['begin', ['define', 'variable', 5], 'variable'], env),
 			5
 		);
-		assert.deepEqual(env['variable'], 5);
+		assert.deepEqual(scheem.lookup(env, 'variable'), 5);
 	});
 	
 	test('should set! values for new variable names', function() {
-		var env = {variable:6};
+		var env = scheem.update({}, 'variable', 6);
 		assert.deepEqual(
 			evalScheem(['set!', 'variable', 5], env),
 			0
 		);
-		assert.deepEqual(env['variable'], 5);
+		assert.deepEqual(scheem.lookup(env, 'variable'), 5);
 	});
 
 	test('should throw exception with set! when variable isn\'t already set', function() {
