@@ -97,6 +97,15 @@ suite('math', function() {
 			5
 		);
 	});
+	test('should add 2 variables that are numbers', function() {
+		var env = {};
+		scheem.update(env, 'x', 2);
+		scheem.update(env, 'y', 3);
+		assert.deepEqual(
+			evalScheem(['+', 'x', 'y'], env),
+			5
+		);
+	});
 
 	test('should throw exception if first argument of + is not numeric', function() {
 		assert.throws(function() {
