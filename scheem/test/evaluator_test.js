@@ -309,3 +309,25 @@ suite('quote', function() {
 	});
 });
 
+suite('lamba-one', function() {
+	test('should return a function that returns the argument', function() {
+		assert.deepEqual(
+			evalScheem([['lambda-one', 'x', 'x'], 5], {}),
+			5
+		);
+	});	
+
+	test('should return a function that returns the argument + 1', function() {
+		assert.deepEqual(
+			evalScheem([['lambda-one', 'x', ['+', 'x', 1]], 5], {}),
+			6
+		);
+	});
+
+	test('should return a function that adds the arguments', function() {
+		assert.deepEqual(		
+			evalScheem([[['lambda-one', 'x', ['lambda-one', 'y', ['+', 'x', 'y']]], 5], 3], {}),
+			8
+		);
+	});
+});

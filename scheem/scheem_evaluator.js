@@ -10,28 +10,36 @@ var evalScheem = function (expr, env) {
     // Look at head of list for operation
     switch (expr[0]) {
         case '+':
-			if((typeof expr[1] !== 'number') || (typeof expr[2] !== 'number')) {
+			var arg1 = evalScheem(expr[1], env);
+			var arg2 = evalScheem(expr[2], env);
+			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
 				throw new Error('Both arguments for math functions must be numeric.');
 			}
-            return evalScheem(expr[1], env) + evalScheem(expr[2], env);
+            return arg1 + arg2;
         case '-':
-			if((typeof expr[1] !== 'number') || (typeof expr[2] !== 'number')) {
+			var arg1 = evalScheem(expr[1], env);
+			var arg2 = evalScheem(expr[2], env);
+			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
 				throw new Error('Both arguments for math functions must be numeric.');
 			}
-            return evalScheem(expr[1], env) - evalScheem(expr[2], env);
+            return arg1 - arg2;
         case '*':
-			if((typeof expr[1] !== 'number') || (typeof expr[2] !== 'number')) {
+			var arg1 = evalScheem(expr[1], env);
+			var arg2 = evalScheem(expr[2], env);
+			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
 				throw new Error('Both arguments for math functions must be numeric.');
 			}
-            return evalScheem(expr[1], env) * evalScheem(expr[2], env);
+            return arg1 * arg2;
         case '/':
-			if((typeof expr[1] !== 'number') || (typeof expr[2] !== 'number')) {
+			var arg1 = evalScheem(expr[1], env);
+			var arg2 = evalScheem(expr[2], env);
+			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
 				throw new Error('Both arguments for math functions must be numeric.');
 			}
-			if(expr[2] == '0') {
+			if(arg2 == 0) {
 				throw new Error('Cannot divide by zero.');
 			}
-            return evalScheem(expr[1], env) / evalScheem(expr[2], env);
+            return arg1 / arg2;
 
 		case 'set!':
 			if(lookup(env, expr[1]) === undefined) {
@@ -96,8 +104,22 @@ var evalScheem = function (expr, env) {
         case 'quote':
             return expr[1];
 
+		case 'lambda-one':
+			return function(arg) {
+                var newenv = {
+                    bindings: [],
+                    outer: env
+                };
+                newenv.bindings[expr[1]] = arg;
+                
+                return evalScheem(expr[2], newenv);
+            };
+
 		default:
-			return (lookup(env, expr[0]))(evalScheem(expr[1], env));
+            var func = evalScheem(expr[0], env);
+            var arg = evalScheem(expr[1], env);
+            return func(arg);
+			
     }
 };
 
