@@ -333,10 +333,26 @@ suite('lamba-one', function() {
 		);
 	});
 
-	test('should return a function that adds the arguments', function() {
+	test('should return a series of functions that add the arguments', function() {
 		assert.deepEqual(		
 			evalScheem([[['lambda-one', 'x', ['lambda-one', 'y', ['+', 'x', 'y']]], 5], 3], {}),
 			8
+		);
+	});
+});
+
+suite('lambda', function() {
+	test('should return a function that add 1 to the argument', function() {
+		assert.deepEqual(
+			evalScheem([['lambda', ['x'], ['+', 'x', 1]], 5], {}),
+			6
+		);
+	});
+
+	test('should return a function that adds the arguments', function() {
+		assert.deepEqual(
+			evalScheem([['lambda', ['x', 'y'], ['+', 'x', 'y']], 5, 6], {}),
+			11
 		);
 	});
 });

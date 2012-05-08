@@ -7,8 +7,30 @@ var evalScheem = function (expr, env) {
 		return lookup(env, expr);
 	}
 
+	if(env.bindings === undefined) {
+		env.bindings = [];
+	}
+
+	add_binding(env, '+', function(expr1, expr2) {
+		var arg1 = evalScheem(expr1, env);
+		var arg2 = evalScheem(expr2, env);
+		if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
+			throw new Error('Both arguments for math functions must be numeric.');
+		}
+		return arg1 + arg2;
+	}, false);
+	add_binding(env, '-', function(expr1, expr2) {
+		var arg1 = evalScheem(expr1, env);
+		var arg2 = evalScheem(expr2, env);
+		if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
+			throw new Error('Both arguments for math functions must be numeric.');
+		}
+		return arg1 - arg2;
+	}, false);
+
     // Look at head of list for operation
     switch (expr[0]) {
+/*
         case '+':
 			var arg1 = evalScheem(expr[1], env);
 			var arg2 = evalScheem(expr[2], env);
@@ -22,7 +44,7 @@ var evalScheem = function (expr, env) {
 			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
 				throw new Error('Both arguments for math functions must be numeric.');
 			}
-            return arg1 - arg2;
+            return arg1 - arg2;*/
         case '*':
 			var arg1 = evalScheem(expr[1], env);
 			var arg2 = evalScheem(expr[2], env);
@@ -46,7 +68,6 @@ var evalScheem = function (expr, env) {
 				throw new Error('Cannot use set! on variable that is not yet defined.');
 			}
         case 'define':
-            //env[expr[1]] = evalScheem(expr[2], env);
 			update(env, expr[1], evalScheem(expr[2], env));
             return 0;
         case 'let-one':
@@ -114,11 +135,27 @@ var evalScheem = function (expr, env) {
                 
                 return evalScheem(expr[2], newenv);
             };
+		case 'lambda':
+			return function() {
+                var newenv = {
+                    bindings: [],
+                    outer: env
+                };
+				for(var argIndex = 0; argIndex < expr[1].length; argIndex++) {
+					var arg = arguments[argIndex];
+                	newenv.bindings[expr[1][argIndex]] = arg;
+				}
+                
+                return evalScheem(expr[2], newenv);
+            };	
 
 		default:
             var func = evalScheem(expr[0], env);
-            var arg = evalScheem(expr[1], env);
-            return func(arg);
+            var args = [];
+			for(var i = 1; i < expr.length; i++) {
+				args.push(evalScheem(expr[i], env));
+			}
+            return func.apply(null, args);
 			
     }
 };
@@ -157,7 +194,12 @@ var update = function (env, v, val) {
     return undefined;
 };
 
-var add_binding = function (env, v, val) {
+var add_binding = function (env, v, val, replace) {
+	if(replace === false) {
+		if(lookup(env, v) !== undefined) {
+			return;
+		}
+	}
     env.bindings[v] = val;
 };
 
