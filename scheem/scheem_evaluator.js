@@ -11,6 +11,7 @@ var evalScheem = function (expr, env) {
 		env.bindings = [];
 	}
 
+	/* Math */
 	add_binding(env, '+', function(expr1, expr2) {
 		var arg1 = evalScheem(expr1, env);
 		var arg2 = evalScheem(expr2, env);
@@ -18,7 +19,7 @@ var evalScheem = function (expr, env) {
 			throw new Error('Both arguments for math functions must be numeric.');
 		}
 		return arg1 + arg2;
-	}, false);
+	});
 	add_binding(env, '-', function(expr1, expr2) {
 		var arg1 = evalScheem(expr1, env);
 		var arg2 = evalScheem(expr2, env);
@@ -26,66 +27,63 @@ var evalScheem = function (expr, env) {
 			throw new Error('Both arguments for math functions must be numeric.');
 		}
 		return arg1 - arg2;
-	}, false);
+	});
+	add_binding(env, '*', function(expr1, expr2) {
+		var arg1 = evalScheem(expr1, env);
+		var arg2 = evalScheem(expr2, env);
+		if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
+			throw new Error('Both arguments for math functions must be numeric.');
+		}
+		return arg1 * arg2;
+	});
+	add_binding(env, '/', function(expr1, expr2) {
+		var arg1 = evalScheem(expr1, env);
+		var arg2 = evalScheem(expr2, env);
+		if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
+			throw new Error('Both arguments for math functions must be numeric.');
+		}
+		if(arg2 == 0) {
+			throw new Error('Cannot divide by zero.');
+		}
+		return arg1 / arg2;
+	});
+
+	/* Variables */
+	add_binding(env, 'define', function(expr1, expr2) {
+		update(env, expr1, evalScheem(expr2, env));
+		return 0;
+	});
+	add_binding(env, 'set!', function(expr1, expr2) {
+		if(lookup(env, expr1) === undefined) {
+			throw new Error('Cannot use set! on variable that is not yet defined.');
+		}
+		update(env, expr1, evalScheem(expr2, env));
+		return 0;
+	});
+	add_binding(env, 'let-one', function(expr1, expr2, expr3) {
+		var newBindings = {};
+		newBindings[expr1] = evalScheem(expr2, env);
+		var tmpEnv = {
+			bindings: newBindings,
+			outer: env
+		};
+		return evalScheem(expr3, tmpEnv);
+	});
+
+	/* Begin */
+	add_binding(env, 'begin', function() {
+	console.log(arguments);
+		var val;
+		for(var i=0; i<arguments.length; i++) {
+			val = evalScheem(arguments[i], env);
+		}
+		return val;
+	});
 
     // Look at head of list for operation
     switch (expr[0]) {
 /*
-        case '+':
-			var arg1 = evalScheem(expr[1], env);
-			var arg2 = evalScheem(expr[2], env);
-			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
-				throw new Error('Both arguments for math functions must be numeric.');
-			}
-            return arg1 + arg2;
-        case '-':
-			var arg1 = evalScheem(expr[1], env);
-			var arg2 = evalScheem(expr[2], env);
-			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
-				throw new Error('Both arguments for math functions must be numeric.');
-			}
-            return arg1 - arg2;*/
-        case '*':
-			var arg1 = evalScheem(expr[1], env);
-			var arg2 = evalScheem(expr[2], env);
-			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
-				throw new Error('Both arguments for math functions must be numeric.');
-			}
-            return arg1 * arg2;
-        case '/':
-			var arg1 = evalScheem(expr[1], env);
-			var arg2 = evalScheem(expr[2], env);
-			if((typeof arg1 !== 'number') || (typeof arg2 !== 'number')) {
-				throw new Error('Both arguments for math functions must be numeric.');
-			}
-			if(arg2 == 0) {
-				throw new Error('Cannot divide by zero.');
-			}
-            return arg1 / arg2;
-
-		case 'set!':
-			if(lookup(env, expr[1]) === undefined) {
-				throw new Error('Cannot use set! on variable that is not yet defined.');
-			}
-        case 'define':
-			update(env, expr[1], evalScheem(expr[2], env));
-            return 0;
-        case 'let-one':
-            var newBindings = {};
-            newBindings[expr[1]] = evalScheem(expr[2], env);
-            var tmpEnv = {
-                bindings: newBindings,
-                outer: env
-            };
-            return evalScheem(expr[3], tmpEnv);
-		
-		case 'begin':
-            var val;
-            for(var i=1; i<expr.length; i++) {
-                val = evalScheem(expr[i], env);
-            }
-            return val;
-		
+		*/
 		case 'cons':
             var arr = evalScheem(expr[2], env);
 			if(toString.call(arr) !== '[object Array]') {
@@ -153,7 +151,7 @@ var evalScheem = function (expr, env) {
             var func = evalScheem(expr[0], env);
             var args = [];
 			for(var i = 1; i < expr.length; i++) {
-				args.push(evalScheem(expr[i], env));
+				args.push(expr[i]);
 			}
             return func.apply(null, args);
 			
@@ -194,12 +192,7 @@ var update = function (env, v, val) {
     return undefined;
 };
 
-var add_binding = function (env, v, val, replace) {
-	if(replace === false) {
-		if(lookup(env, v) !== undefined) {
-			return;
-		}
-	}
+var add_binding = function (env, v, val) {
     env.bindings[v] = val;
 };
 
