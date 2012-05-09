@@ -183,7 +183,7 @@ suite('math', function() {
 	});
 });
 
-suite('conditionals', function() {
+suite('comparisons', function() {
 	test('should evaluate < as true when left is <', function() {
 		assert.deepEqual(
 			evalScheem(['<', 1, 3], {}),
@@ -201,6 +201,20 @@ suite('conditionals', function() {
 	test('should evaluate < as false when left is >', function() {
 		assert.deepEqual(
 			evalScheem(['<', 3, 1], {}),
+			'#f'
+		);
+	});
+
+	test('should evaluate < as true when left is <, with expressions', function() {
+		assert.deepEqual(
+			evalScheem(['<', ['+', 1, 1], ['+', 3, 1]], {}),
+			'#t'
+		);
+	});
+
+	test('should evaluate < as false when left is =, with expressions', function() {
+		assert.deepEqual(
+			evalScheem(['<', ['+', 1, 3], ['+', 1, 3]], {}),
 			'#f'
 		);
 	});

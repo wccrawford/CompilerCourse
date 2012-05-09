@@ -72,7 +72,6 @@ var evalScheem = function (expr, env) {
 
 	/* Begin */
 	add_binding(env, 'begin', function() {
-	console.log(arguments);
 		var val;
 		for(var i=0; i<arguments.length; i++) {
 			val = evalScheem(arguments[i], env);
@@ -80,82 +79,92 @@ var evalScheem = function (expr, env) {
 		return val;
 	});
 
-    // Look at head of list for operation
-    switch (expr[0]) {
-/*
-		*/
-		case 'cons':
-            var arr = evalScheem(expr[2], env);
-			if(toString.call(arr) !== '[object Array]') {
-				throw new Error('Second argument of cons must be a list.');
-			}
-            arr.unshift(evalScheem(expr[1], env));
-            return arr;
-        case 'car':
-            var arr = evalScheem(expr[1], env);
-			if(toString.call(arr) !== '[object Array]') {
-				throw new Error('First argument of car must be a list.');
-			}
-            return arr.shift();
-        case 'cdr':
-            var arr = evalScheem(expr[1], env);
-			if(toString.call(arr) !== '[object Array]') {
-				throw new Error('First argument of cdr must be a list.');
-			}
-            arr.shift();
-            return arr;
+	/* Lists */
+	add_binding(env, 'cons', function(expr1, expr2) {
+		var arg1 = evalScheem(expr1, env);
+		var arr = evalScheem(expr2, env);
+		if(toString.call(arr) !== '[object Array]') {
+			throw new Error('Second argument of cons must be a list.');
+		}
+		arr.unshift(arg1);
+		return arr;
+	});
+	add_binding(env, 'car', function(expr1) {
+		var arr = evalScheem(expr1, env);
+		if(toString.call(arr) !== '[object Array]') {
+			throw new Error('First argument of car must be a list.');
+		}
+		return arr.shift();
+	});
+	add_binding(env, 'cdr', function(expr1) {
+		var arr = evalScheem(expr1, env);
+		if(toString.call(arr) !== '[object Array]') {
+			throw new Error('First argument of cdr must be a list.');
+		}
+		arr.shift();
+		return arr;
+	});
 
-		case '<':
-			return (expr[1] < expr[2]) ? '#t' : '#f';
-		case '=':
-			return (expr[1] == expr[2]) ? '#t' : '#f';
+	/* Comparison */
+	add_binding(env, '<', function(expr1, expr2) {
+		return (expr1 < expr2) ? '#t' : '#f';
+	});
+	add_binding(env, '=', function(expr1, expr2) {
+		return (expr1 == expr2) ? '#t' : '#f';
+	});
+	add_binding(env, 'if', function(expr1, expr2, expr3) {
+		var eval = evalScheem(expr1, env);
+		if(eval == '#t') {
+			return evalScheem(expr2, env);
+		} else if(eval == '#f') {
+			return evalScheem(expr3, env);
+		} else {
+			throw new Error('Conditional is neither true nor false.');
+		}
+	});
 
-		case 'if':
-			var eval = evalScheem(expr[1], env);
-			if(eval == '#t') {
-                return evalScheem(expr[2], env);
-            } else if(eval == '#f') {
-                return evalScheem(expr[3], env);
-            } else {
-				throw new Error('Conditional is neither true nor false.');
-			}
+	/* Quote */
+	add_binding(env, 'quote', function(expr1) {
+		return expr1;
+	});
 
-        case 'quote':
-            return expr[1];
-
-		case 'lambda-one':
-			return function(arg) {
-                var newenv = {
-                    bindings: [],
-                    outer: env
-                };
-                newenv.bindings[expr[1]] = arg;
-                
-                return evalScheem(expr[2], newenv);
-            };
-		case 'lambda':
-			return function() {
-                var newenv = {
-                    bindings: [],
-                    outer: env
-                };
-				for(var argIndex = 0; argIndex < expr[1].length; argIndex++) {
-					var arg = arguments[argIndex];
-                	newenv.bindings[expr[1][argIndex]] = arg;
-				}
-                
-                return evalScheem(expr[2], newenv);
-            };	
-
-		default:
-            var func = evalScheem(expr[0], env);
-            var args = [];
-			for(var i = 1; i < expr.length; i++) {
-				args.push(expr[i]);
-			}
-            return func.apply(null, args);
+	/* Lambda */
+	add_binding(env, 'lambda-one', function(expr1, expr2) {
+		return function(arg) {
+			var newenv = {
+				bindings: [],
+				outer: env
+			};
+			newenv.bindings[expr1] = arg;
 			
-    }
+			return evalScheem(expr2, newenv);
+		};
+	});
+	add_binding(env, 'lambda', function(expr1, expr2) {
+		return function() {
+			var newenv = {
+				bindings: [],
+				outer: env
+			};
+			for(var argIndex = 0; argIndex < expr1.length; argIndex++) {
+				var arg = arguments[argIndex];
+				newenv.bindings[expr1[argIndex]] = arg;
+			}
+			
+			return evalScheem(expr2, newenv);
+		};	
+	});
+
+    // Look at head of list for operation
+	var func = evalScheem(expr[0], env);
+
+	// Collect the rest of the list as arguments
+	var args = [];
+	for(var i = 1; i < expr.length; i++) {
+		args.push(expr[i]);
+	}
+
+	return func.apply(null, args);
 };
 
 var lookup = function (env, v) {
